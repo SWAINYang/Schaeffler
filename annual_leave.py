@@ -294,6 +294,9 @@ class MSSQL:
         con.commit()
         con.close()
 
+"""
+Code is start from here
+"""
 def determine_function(row):
     org_unit_text = row['OrgUnit_text']
     if org_unit_text in ['OP/SCA-PII', 'OP/SCA-PIIE', 'OP/SCA-PIID', 'OP/SCA-PII1', 'OP/SCA-PIIP']:
@@ -411,7 +414,7 @@ def send_all_data_email(df, row):
 
     # Create and send the email
     sender_name = "Plant 3 IE/PM"
-    sender_address = "yangsyu@schaeffler.com"
+    sender_address = "OR-Taicang-Plant3-IE-and-PM@schaeffler.com"
     # receiver = ["yangsyu@schaeffler.com"]
     receiver = [row['Email_address']]
     cc = []
@@ -472,7 +475,7 @@ def send_specific_data_email(df, row):
 
     # Create and send the email
     sender_name = "Plant 3 IE/PM"
-    sender_address = "yangsyu@schaeffler.com"
+    sender_address = "OR-Taicang-Plant3-IE-and-PM@schaeffler.com"
     # receiver = ["yangsyu@schaeffler.com"]
     receiver = [row['Email_address']]
     cc = []
@@ -494,7 +497,7 @@ def send_single_data_email(df, row):
     </html>"""
     # Create and send the email
     sender_name = "Plant 3 IE/PM"
-    sender_address = "yangsyu@schaeffler.com"
+    sender_address = "OR-Taicang-Plant3-IE-and-PM@schaeffler.com"
     # receiver = ["yangsyu@schaeffler.com"]
     receiver = [row['Email_address']]
     cc = []
