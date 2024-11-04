@@ -9,6 +9,7 @@ from email.mime.multipart import MIMEMultipart
 from email.header import Header
 from email.utils import formataddr
 import logging
+import shutil
 
 class Logger:
 
@@ -242,6 +243,26 @@ def process_excel_closed(file):
         send_email('Data Cleaning Error', f"An error occurred while processing file {file}: {e}", log_file)
 
 
+def move_processed_files(source_dir, destination_dir):
+
+    files_to_move = glob.glob(os.path.join(source_dir, "*.xlsx"))
+    if not files_to_move:
+        print("No files to move in the source directory.")
+        return
+
+
+    if not os.path.exists(destination_dir):
+        os.makedirs(destination_dir)
+
+
+    for file in files_to_move:
+        try:
+            shutil.move(file, destination_dir)
+            print(f"Moved: {file} -> {destination_dir}")
+        except Exception as e:
+            print(f"Failed to move file {file}: {e}")
+            logging.error(f"Failed to move file {file}: {e}")
+
 network_path = r'\\schaeffler.com\taicang\Data\OP-SCA-PI\PII\08_Private Database\37_IM_Database'
 xlsx_files = glob.glob(os.path.join(network_path, "*.xlsx"))
 
@@ -255,16 +276,30 @@ for file in xlsx_files:
 
 latest_files = {k: max(v, key=lambda x: x[0])[1] for k, v in latest_files.items()}
 
-for target_table, file in latest_files.items():
-    try:
-        if target_table == table_name_default:
-            process_excel_default(file)
-        elif target_table == table_name_closed:
-            process_excel_closed(file)
-    except Exception as e:
-        print(f"Failed to process file {file}: {e}")
-        logging.error(f"An error occurred while processing file {file}: {e}")
-        send_email('Path Error', f"An error occurred while processing file {file}: {e}", log_file)
+if latest_files:  
+    engine = create_engine(
+        f'mssql+pyodbc://{config_data["mssql"]["user"]}:{config_data["mssql"]["password"]}@'
+        f'{config_data["mssql"]["server"]}/{config_data["mssql"]["database"]}?driver=ODBC+Driver+17+for+SQL+Server',
+        fast_executemany=True
+    )
 
 
-print("All files processed.")
+    clear_table(engine, table_name_default)
+    clear_table(engine, table_name_closed)
+
+    for target_table, file in latest_files.items():
+        try:
+            if target_table == table_name_default:
+                process_excel_default(file)
+            elif target_table == table_name_closed:
+                process_excel_closed(file)
+        except Exception as e:
+            print(f"Failed to process file {file}: {e}")
+            logging.error(f"An error occurred while processing file {file}: {e}")
+            send_email('Path Error', f"An error occurred while processing file {file}: {e}", log_file)
+
+    move_processed_files(network_path, r'\\schaeffler.com\taicang\Data\OP-SCA-PI\PII\08_Private Database\37_IM_Database\00_History')
+
+    print("All files processed and moved.")
+else:
+    print("No files to process.")
