@@ -37,8 +37,8 @@ config_data = {
     }
 }
 
-table_name_default = 'fact_rationalization_suggestions'
-table_name_closed = 'fact_closed_rationalization_suggestions'
+table_name_default = 'fact_im_submit_data'
+table_name_closed = 'fact_im_closed_data'
 
 engine = create_engine(
     f'mssql+pyodbc://{config_data["mssql"]["user"]}:{config_data["mssql"]["password"]}@'
