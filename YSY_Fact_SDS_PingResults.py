@@ -167,24 +167,25 @@ def save_ping_results(engine, results):
     ]
     results_df = pd.DataFrame(results_with_pingtime, columns=['Id', 'IPAddress', 'Success', 'ResponseTime', 'PingTime'])
     
-
     print("Before cleaning:")
     print(results_df)
     
     results_df = clean_data(results_df, db_column_types)
     
-
     print("After cleaning:")
     print(results_df)
     
-    for _, row in results_df.iterrows():
-        record = row.to_dict()
-        try:
-            update_or_insert(engine, 'Fact_SDS_PingResults', record, 'Id', ['Success', 'ResponseTime', 'PingTime'])
-        except Exception as e:
-            error_message = f"Failed to write to database: {e}"
-            logger.error(error_message)
-            send_email("Database Write Failure", error_message, log_file)
+    # Insert all records into the database
+    with engine.begin() as conn:
+        for _, row in results_df.iterrows():
+            record = row.to_dict()
+            try:
+                insert_stmt = text(f"INSERT INTO Fact_SDS_PingResults ({', '.join(record.keys())}) VALUES ({', '.join([f':{k}' for k in record.keys()])})")
+                conn.execute(insert_stmt, record)
+            except Exception as e:
+                error_message = f"Failed to write to database: {e}"
+                logger.error(error_message)
+                send_email("Database Write Failure", error_message, log_file)
 
 # def main():
 #     epaper_engine = create_db_engine(db_configs["epaper_sca_gc"])
