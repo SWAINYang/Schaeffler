@@ -135,7 +135,7 @@ def clean_data(df, db_column_types):
             if isinstance(db_type, sqlalchemy.types.String):
                 df[db_col] = df[db_col].astype(str)
             elif isinstance(db_type, sqlalchemy.types.Float):
-                df[db_col] = pd.to_numeric(df[db_col], errors='coerce').replace([float('inf'), float('-inf'), float('nan')], None).astype(float)
+                df[db_col] = pd.to_numeric(df[db_col], errors='coerce').replace([float('inf'), float('-inf'), float('nan')], 0.0).astype(float)
             elif isinstance(db_type, sqlalchemy.types.Integer):
                 df[db_col] = pd.to_numeric(df[db_col], errors='coerce').fillna(0).astype(int)
             elif isinstance(db_type, sqlalchemy.types.DateTime):
