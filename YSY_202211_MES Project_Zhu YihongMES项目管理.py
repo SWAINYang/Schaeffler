@@ -37,7 +37,7 @@ else:
         'Department', 'PV', 'Machine', 'Description',
         'APP应用', 'MS0生产准备',
         'MS1_SDS安装', 'MS2_SDS配置', 'MS3_NATS连接', 'MS4_APP配置',
-        'MS5_APP培训上线', 'MS6_APP_To_SAP', 'MS7_写PLC', 'Group_组设备', 'APP_Type', 'Connectivty连接方式', 'Status'
+        'MS5_APP培训上线', 'MS6_APP_To_SAP', 'MS7_写PLC', 'Group_组设备', 'APP_Type', 'Connectivity连接方式', 'Status'
     ]
 
     excel_data.columns = new_column_names
@@ -76,9 +76,9 @@ else:
         # 清空表
         clear_table(engine, table_name)
 
-        # 添加年份列
-        current_year = datetime.now().year
-        excel_data['Year'] = str(current_year)
+        # 获取当前时间并添加为新的一列
+        run_time = datetime.now()
+        excel_data['Run Time'] = run_time
 
         # 映射列名
         column_mapping = {
@@ -86,7 +86,7 @@ else:
             'PV': 'PV',
             'Machine': 'Machine',
             'Description': 'Description',
-            'Connectivty连接方式': 'Connectivty',  
+            'Connectivity连接方式': 'Connectivity',  
             'APP应用': 'APP',
             'APP_Type': 'APP Type',
             'MS0生产准备': 'MS0',
@@ -99,7 +99,7 @@ else:
             'MS7_写PLC': 'MS7',
             'Group_组设备': 'Group',
             'Status': 'Status',
-            'Year': 'Year'
+            'Run Time': 'Run Time'
         }
 
         # 重命名列
@@ -107,19 +107,16 @@ else:
         excel_data = excel_data.where(pd.notnull(excel_data), None)
 
         # 清洗字符串数据
-        string_columns = ['Department', 'PV', 'Machine', 'Description', 'APP', 'MS0', 'MS1', 'MS2', 'MS3', 'MS4', 'MS5', 'MS6', 'MS7', 'APP Type', 'Connectivty', 'Status']
+        string_columns = ['Department', 'PV', 'Machine', 'Description', 'APP', 'MS0', 'MS1', 'MS2', 'MS3', 'MS4', 'MS5', 'MS6', 'MS7', 'APP Type', 'Connectivity', 'Status']
 
         # 确保 Group 是整数
         excel_data['Group'] = pd.to_numeric(excel_data['Group'], errors='coerce').astype('Int64')
 
-        # 确保 Year 是四位数的字符串
-        excel_data['Year'] = excel_data['Year'].str.zfill(4)
-
         # 确保 APP Type 长度不超过 5
         excel_data['APP Type'] = excel_data['APP Type'].astype(str).str[:5]
 
-        # 确保 Connectivty 长度不超过 10
-        excel_data['Connectivty'] = excel_data['Connectivty'].astype(str).str[:10]
+        # 确保 Connectivity 长度不超过 10
+        excel_data['Connectivity'] = excel_data['Connectivity'].astype(str).str[:10]
 
         # 清洗字符串数据中的非法字符
         for col in string_columns:
@@ -188,3 +185,5 @@ else:
 
         finally:
             engine.dispose()
+
+
