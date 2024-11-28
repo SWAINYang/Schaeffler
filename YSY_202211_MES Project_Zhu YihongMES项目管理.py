@@ -118,9 +118,9 @@ else:
         # 确保 Connectivity 长度不超过 10
         excel_data['Connectivity'] = excel_data['Connectivity'].astype(str).str[:10]
 
-        # 清洗字符串数据中的非法字符
-        for col in string_columns:
-            excel_data[col] = excel_data[col].apply(lambda x: re.sub(r'[^\x00-\x7F]', '', str(x)) if pd.notnull(x) else None)
+        # # 清洗字符串数据中的非法字符
+        # for col in string_columns:
+        #     excel_data[col] = excel_data[col].apply(lambda x: re.sub(r'[^\x00-\x7F]', '', str(x)) if pd.notnull(x) else None)
 
         # 获取数据库表的列信息
         inspector = inspect(engine)
@@ -131,9 +131,9 @@ else:
         # 对数据类型进行转换，匹配数据库表的列类型
         for db_col, db_type in db_column_types.items():
             if db_col in excel_data.columns:
-                if isinstance(db_type, sqlalchemy.types.String):
-                    excel_data[db_col] = excel_data[db_col].astype(str)
-                elif isinstance(db_type, sqlalchemy.types.Float):
+                # if isinstance(db_type, sqlalchemy.types.String):
+                #     excel_data[db_col] = excel_data[db_col].astype(str)
+                if isinstance(db_type, sqlalchemy.types.Float):
                     excel_data[db_col] = pd.to_numeric(excel_data[db_col], errors='coerce').astype(float)
                 elif isinstance(db_type, sqlalchemy.types.Integer):
                     excel_data[db_col] = pd.to_numeric(excel_data[db_col], errors='coerce').fillna(0).astype(int)
